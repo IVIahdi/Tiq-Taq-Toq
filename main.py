@@ -48,6 +48,23 @@ class Tic_Tac_Toe():
         self.O_score = 0
         self.tie_score = 0
 
+
+    ###########################################
+    def myQuatum(self):
+        qc = QuantumCircuit(2,2)
+        qc.h(0)
+        qc.cx(0,1)
+        qc.x(0)
+
+        qc.measure([0,1],[0,1])
+
+        Aer = AerSimulator()
+        result = Aer.run(qc, shots=1).result().get_counts()
+        mBits = list(result.keys())[0]
+        print(mBits)
+        return qc
+    ######################################
+
     def mainloop(self):
         self.window.mainloop()
 
@@ -107,10 +124,6 @@ class Tic_Tac_Toe():
                                 grid_position[0] + offset, grid_position[1] - offset,
                             width=symbol_thickness, fill=symbol_X_color)
 
-
-
-
-
     ###############
     def display_gameover(self):
 
@@ -156,7 +169,6 @@ class Tic_Tac_Toe():
 
     def convert_grid_to_logical_position(self, grid_position):
         grid_position = np.array(grid_position)
-        print(grid_position)
         return np.array(grid_position // (size_of_board / 3), dtype=int)
 
     def is_grid_occupied(self, logical_position):
@@ -222,16 +234,16 @@ class Tic_Tac_Toe():
         grid_position = [event.x, event.y]
         logical_position = self.convert_grid_to_logical_position(grid_position)
         
-        
-        if self.turn in [2,3, 6,7]:
-            print(self.turn)
+        #################
+        if self.turn in [2,6]:
             self.Ent = True
+        ########################
 
         
         if not self.reset_board:
             if self.player_X_turns:
                 if not self.is_grid_occupied(logical_position):
-                    if self.Ent:
+                    if self.Ent: ###########3
                         self.draw_X_in_circle(logical_position)
                         self.board_status[logical_position[0]][logical_position[1]] = 0
                         self.player_X_turns = not self.player_X_turns
@@ -239,19 +251,24 @@ class Tic_Tac_Toe():
                         self.draw_X(logical_position)
                         self.board_status[logical_position[0]][logical_position[1]] = -1
                         self.player_X_turns = not self.player_X_turns
-                    self.turn +=1
+                    self.turn +=1 ###############33
             else:
                 if not self.is_grid_occupied(logical_position):
-                    if self.Ent:
+                    if self.Ent: ####################3
                         self.draw_X_in_circle(logical_position)
                         self.board_status[logical_position[0]][logical_position[1]] = 0
                         self.player_X_turns = not self.player_X_turns
+
+                        ###################
+                        self.myQuatum()
+                        ###############
                         self.Ent = False
                     else:
                         self.draw_O(logical_position)
                         self.board_status[logical_position[0]][logical_position[1]] = 1
                         self.player_X_turns = not self.player_X_turns
-                    self.turn += 1
+                    self.turn += 1 ###########3
+
 
 
             # Check if game is concluded
@@ -267,10 +284,3 @@ class Tic_Tac_Toe():
 game_instance = Tic_Tac_Toe()
 game_instance.mainloop()
 
-def myQuatum():
-    qc = QuantumCircuit(2,2)
-    qc.h(0)
-    qc.cx(0,1)
-
-    qc.measure([0,1],[0,1])
-    return qc
