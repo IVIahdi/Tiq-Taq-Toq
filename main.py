@@ -23,7 +23,7 @@ class Tic_Tac_Toe():
     # ------------------------------------------------------------------
     def __init__(self):
         self.window = Tk()
-        self.window.title('Tic-Tac-Toe')
+        self.window.title('Tiq-Taq-Toq')
         self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)
         self.canvas.pack()
         # Input from user in form of clicks
@@ -51,18 +51,28 @@ class Tic_Tac_Toe():
 
     ###########################################
     def myQuatum(self):
-        qc = QuantumCircuit(2,2)
+        qc = QuantumCircuit(2, 2)
         qc.h(0)
-        qc.cx(0,1)
+        qc.cx(0, 1)
         qc.x(0)
-
-        qc.measure([0,1],[0,1])
+        qc.measure([0, 1], [0, 1])
 
         Aer = AerSimulator()
         result = Aer.run(qc, shots=1).result().get_counts()
-        mBits = list(result.keys())[0]
+        mBits = list(result.keys())[0]  # Get measurement bits as a string e.g., '01'
         print(mBits)
-        return qc
+
+        board_positions = np.argwhere(self.board_status == 5)
+
+        for i, pos in enumerate(board_positions):
+            if i < len(mBits):
+                if mBits[i] == '1':
+                    self.board_status[pos[0], pos[1]] = -1
+                else:
+                    self.board_status[pos[0], pos[1]] = 1
+        self.redraw_board()
+
+
     ######################################
 
     def mainloop(self):
@@ -85,6 +95,22 @@ class Tic_Tac_Toe():
     # Drawing Functions:
     # The modules required to draw required game based object on canvas
     # ------------------------------------------------------------------
+
+    def redraw_board(self):
+        # Clear the canvas
+        self.canvas.delete("all")
+
+        # Redraw the grid lines
+        self.initialize_board()
+
+        # Redraw all the symbols based on board_status
+        for i in range(3):  # Assume 3x3 board
+            for j in range(3):
+                pos = [i, j]
+                if self.board_status[i][j] == 1:  # Assuming 1 is O
+                    self.draw_O(pos)
+                elif self.board_status[i][j] == -1:  # Assuming -1 is X
+                    self.draw_X(pos)
 
     def draw_O(self, logical_position):
         logical_position = np.array(logical_position)
@@ -226,9 +252,6 @@ class Tic_Tac_Toe():
 
         return gameover
 
-
-
-
     
     def click(self, event):
         grid_position = [event.x, event.y]
@@ -245,7 +268,7 @@ class Tic_Tac_Toe():
                 if not self.is_grid_occupied(logical_position):
                     if self.Ent: ###########3
                         self.draw_X_in_circle(logical_position)
-                        self.board_status[logical_position[0]][logical_position[1]] = 0
+                        self.board_status[logical_position[0]][logical_position[1]] = 5
                         self.player_X_turns = not self.player_X_turns
                     else:
                         self.draw_X(logical_position)
@@ -256,7 +279,7 @@ class Tic_Tac_Toe():
                 if not self.is_grid_occupied(logical_position):
                     if self.Ent: ####################3
                         self.draw_X_in_circle(logical_position)
-                        self.board_status[logical_position[0]][logical_position[1]] = 0
+                        self.board_status[logical_position[0]][logical_position[1]] = 5
                         self.player_X_turns = not self.player_X_turns
 
                         ###################
