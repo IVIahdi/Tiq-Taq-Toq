@@ -76,6 +76,26 @@ class Tic_Tac_Toe():
         self.redraw_board()
 
 
+    def show_start_screen(self):
+        # Clear the current canvas
+        self.canvas.delete("all")
+
+        # Add title or instructions
+        self.canvas.create_text(size_of_board / 2, size_of_board / 4, 
+                                text='Select Game Mode', font='cmr 20 bold', fill='black')
+
+        # Button for Easy Mode
+        easy_btn = Button(self.window, text='Easy Mode', command=lambda: self.set_game_mode('easy'))
+        easy_btn_canvas = self.canvas.create_window(size_of_board / 2, size_of_board / 2 - 30,
+                                                    window=easy_btn)
+
+        # Button for Hard Mode
+        hard_btn = Button(self.window, text='Hard Mode', command=lambda: self.set_game_mode('hard'))
+        hard_btn_canvas = self.canvas.create_window(size_of_board / 2, size_of_board / 2 + 30,
+                                                window=hard_btn)
+
+
+
     ######################################
 
     def mainloop(self):
