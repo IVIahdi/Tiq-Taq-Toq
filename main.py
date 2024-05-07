@@ -6,6 +6,7 @@ from tkinter import *
 import numpy as np
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
+import time
 
 size_of_board = 600
 symbol_size = (size_of_board / 3 - size_of_board / 8) / 2
@@ -42,6 +43,7 @@ class Tic_Tac_Toe():
         ##########
         self.turn = 0
         self.Ent = False
+        self.gamemode = 0
         ########
 
         self.X_score = 0
@@ -70,6 +72,7 @@ class Tic_Tac_Toe():
                     self.board_status[pos[0], pos[1]] = -1
                 else:
                     self.board_status[pos[0], pos[1]] = 1
+        
         self.redraw_board()
 
 
@@ -86,10 +89,17 @@ class Tic_Tac_Toe():
             self.canvas.create_line(0, (i + 1) * size_of_board / 3, size_of_board, (i + 1) * size_of_board / 3)
 
     def play_again(self):
-        self.initialize_board()
-        self.player_X_starts = not self.player_X_starts
-        self.player_X_turns = self.player_X_starts
+        # Reset the game variables
+        self.player_X_turns = not self.player_X_starts
+        self.reset_board = False
+        self.gameover = False
+        self.tie = False
+        self.X_wins = False
+        self.O_wins = False
+        self.turn = 0
+        self.Ent = False
         self.board_status = np.zeros(shape=(3, 3))
+        self.redraw_board()
 
     # ------------------------------------------------------------------
     # Drawing Functions:
@@ -155,11 +165,11 @@ class Tic_Tac_Toe():
 
         if self.X_wins:
             self.X_score += 1
-            text = 'Winner: Player 1 (X)'
+            text = 'Winner: (X)'
             color = symbol_X_color
         elif self.O_wins:
             self.O_score += 1
-            text = 'Winner: Player 2 (O)'
+            text = 'Winner: (O)'
             color = symbol_O_color
         else:
             self.tie_score += 1
@@ -235,6 +245,10 @@ class Tic_Tac_Toe():
     def is_gameover(self):
         # Either someone wins or all grid occupied
         self.X_wins = self.is_winner('X')
+
+        print(self.board_status)
+
+
         if not self.X_wins:
             self.O_wins = self.is_winner('O')
 
@@ -250,6 +264,7 @@ class Tic_Tac_Toe():
         if self.tie:
             print('Its a tie')
 
+        
         return gameover
 
     
@@ -274,6 +289,9 @@ class Tic_Tac_Toe():
                         self.draw_X(logical_position)
                         self.board_status[logical_position[0]][logical_position[1]] = -1
                         self.player_X_turns = not self.player_X_turns
+                        ###################
+                        self.myQuatum()
+                        ###############
                     self.turn +=1 ###############33
             else:
                 if not self.is_grid_occupied(logical_position):
@@ -282,9 +300,7 @@ class Tic_Tac_Toe():
                         self.board_status[logical_position[0]][logical_position[1]] = 5
                         self.player_X_turns = not self.player_X_turns
 
-                        ###################
-                        self.myQuatum()
-                        ###############
+                        
                         self.Ent = False
                     else:
                         self.draw_O(logical_position)
