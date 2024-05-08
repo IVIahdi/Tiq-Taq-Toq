@@ -1,34 +1,24 @@
-# Tic-Tac-Toe
+# Tiq-Taq-Toq
 
-This repository contains python based interactive Tic-Tac-Toe game.
+Tiq-Taq-Toq is a quantum-inspired version of the classic game Tic-Tac-Toe, implemented in Python using the Tkinter library for the graphical user interface and Qiskit to handle quantum operations. This game allows players to experience two different modes: Superposition Mode and Entanglement Mode, offering a unique twist on the traditional gameplay.
 
-## Running Tic-Tac-Toe:
+## Features
 
-```
-git clone https://github.com/aqeelanwar/Tic-Tac-Toe.git
-cd Tic-Tac-Toe
-python main.py
-```
+- **Quantum Modes:** Play Tic-Tac-Toe with quantum effects:
+  - **Entanglement Mode (Fare):** Moves are based on quantum entanglement principles.
+  - **Superposition Mode (Unfare):** Utilizes the concept of superposition to influence the board.
+- **Graphical User Interface:** Fully interactive GUI built with Tkinter.
+- **Quantum Circuit Simulation:** Quantum operations are simulated using Qiskit, providing an authentic quantum experience.
 
-<p align="center">
-<img src="/images/preview.gif">
-</p>
+## Prerequisites
 
-## Screenshots
-<p align="center">
-<img width=1000 src="/images/screenshot.png">
+Before you can run Tiq-Taq-Toq, ensure you have the following installed:
+- Python 3.x
+- `numpy`
+- `qiskit`
+- `tkinter` (usually comes with Python)
 
-</p>
+You can install the required packages using pip:
 
-## Controls
-1. Player X starts the game
-2. Click on each grid to place symbol
-3. The result of the game is displayed at the end of the game
-4. A track of player scores is maintained
-5. Click anywhere on the result screen to play again
-
-
-
-## Author
-[Aqeel Anwar](https://www.prism.gatech.edu/~manwar8)
-
+```bash
+pip install numpy qiskit tkinter
