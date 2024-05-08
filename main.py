@@ -16,13 +16,35 @@ symbol_O_color = '#0492CF'
 
 symbol_XO_color = '#800080'
 Green_color = '#7BC043'
+black = '#000000'
+###########################
+class StartupScreen:
+    def __init__(self):
+        self.root = Tk()
+        self.root.title('Tiq-Taq-Toq Mode Selection')
 
+        self.canvas = Canvas(self.root, width=400, height=300)
+        self.canvas.pack()
 
-class Tic_Tac_Toe():
+        entangle_btn = Button(self.root, text='Entanglement Mode (Fare)', command=lambda: self.start_game(0))
+        entangle_btn_canvas = self.canvas.create_window(200, 100, window=entangle_btn)
+
+        superpos_btn = Button(self.root, text='Superposition Mode (Unfare)', command=lambda: self.start_game(1))
+        superpos_btn_canvas = self.canvas.create_window(200, 200, window=superpos_btn)
+
+    def start_game(self, mode):
+        self.root.destroy()
+        game_instance = Tiq_Taq_Toq(mode)
+        game_instance.mainloop()
+
+    def run(self):
+        self.root.mainloop()
+###########################################
+class Tiq_Taq_Toq():
     # ------------------------------------------------------------------
     # Initialization Functions:
     # ------------------------------------------------------------------
-    def __init__(self):
+    def __init__(self, mode):
         self.window = Tk()
         self.window.title('Tiq-Taq-Toq')
         self.canvas = Canvas(self.window, width=size_of_board, height=size_of_board)
@@ -43,7 +65,8 @@ class Tic_Tac_Toe():
         ##########
         self.turn = 0
         self.Ent = False
-        self.gamemode = 0
+        self.gamemode = mode
+        self.update_status_text()
         ########
 
         self.X_score = 0
@@ -55,14 +78,22 @@ class Tic_Tac_Toe():
     def myQuatum(self):
         qc = QuantumCircuit(2, 2)
         qc.h(0)
-        qc.cx(0, 1)
-        qc.x(0)
+
+        if self.gamemode:
+            qc.h(1)
+        else:
+            qc.cx(0, 1)
+            qc.x(0)
+        
         qc.measure([0, 1], [0, 1])
+
+        # E 0 S 1
 
         Aer = AerSimulator()
         result = Aer.run(qc, shots=1).result().get_counts()
-        mBits = list(result.keys())[0]  # Get measurement bits as a string e.g., '01'
+        mBits = list(result.keys())[0][::-1]
         print(mBits)
+        #1 X 0 O
 
         board_positions = np.argwhere(self.board_status == 5)
 
@@ -74,27 +105,11 @@ class Tic_Tac_Toe():
                     self.board_status[pos[0], pos[1]] = 1
         
         self.redraw_board()
-
-
-    def show_start_screen(self):
-        # Clear the current canvas
-        self.canvas.delete("all")
-
-        # Add title or instructions
-        self.canvas.create_text(size_of_board / 2, size_of_board / 4, 
-                                text='Select Game Mode', font='cmr 20 bold', fill='black')
-
-        # Button for Easy Mode
-        easy_btn = Button(self.window, text='Easy Mode', command=lambda: self.set_game_mode('easy'))
-        easy_btn_canvas = self.canvas.create_window(size_of_board / 2, size_of_board / 2 - 30,
-                                                    window=easy_btn)
-
-        # Button for Hard Mode
-        hard_btn = Button(self.window, text='Hard Mode', command=lambda: self.set_game_mode('hard'))
-        hard_btn_canvas = self.canvas.create_window(size_of_board / 2, size_of_board / 2 + 30,
-                                                window=hard_btn)
-
-
+        
+    def update_status_text(self):
+        status = f'Quantum Move {"O" if self.turn  % 2 == 1 else "X"}' if self.turn in [2,3,6,7] else f'Classical Move {"O" if self.turn  % 2 == 1 else "X"}'
+        self.canvas.delete("status_text")
+        self.canvas.create_text(size_of_board / 2, size_of_board / 2, text=status, font="cmr 20 bold", fill="purple", tags="status_text")
 
     ######################################
 
@@ -109,17 +124,23 @@ class Tic_Tac_Toe():
             self.canvas.create_line(0, (i + 1) * size_of_board / 3, size_of_board, (i + 1) * size_of_board / 3)
 
     def play_again(self):
-        # Reset the game variables
-        self.player_X_turns = not self.player_X_starts
+        self.initialize_board()
+        self.player_X_turns = True
+        self.board_status = np.zeros(shape=(3, 3))
+
+        self.player_X_starts = True
         self.reset_board = False
         self.gameover = False
         self.tie = False
         self.X_wins = False
         self.O_wins = False
+        ##########
         self.turn = 0
         self.Ent = False
-        self.board_status = np.zeros(shape=(3, 3))
-        self.redraw_board()
+        self.gamemode = 0
+        self.update_status_text()
+        ########
+
 
     # ------------------------------------------------------------------
     # Drawing Functions:
@@ -127,21 +148,16 @@ class Tic_Tac_Toe():
     # ------------------------------------------------------------------
 
     def redraw_board(self):
-        # Clear the canvas
         self.canvas.delete("all")
-
-        # Redraw the grid lines
         self.initialize_board()
 
-        # Redraw all the symbols based on board_status
-        for i in range(3):  # Assume 3x3 board
+        for i in range(3):
             for j in range(3):
                 pos = [i, j]
-                if self.board_status[i][j] == 1:  # Assuming 1 is O
+                if self.board_status[i][j] == 1:  # 1 is O
                     self.draw_O(pos)
-                elif self.board_status[i][j] == -1:  # Assuming -1 is X
+                elif self.board_status[i][j] == -1:  # -1 is X
                     self.draw_X(pos)
-
     def draw_O(self, logical_position):
         logical_position = np.array(logical_position)
         # logical_position = grid value on the board
@@ -170,7 +186,7 @@ class Tic_Tac_Toe():
                                 grid_position[0] + radius, grid_position[1] + radius,
                                 width=symbol_thickness, outline=symbol_O_color)
 
-        offset = radius * 0.707  # This adjusts the X to fit inside the circle (radius / sqrt(2))
+        offset = radius * 0.707
 
         self.canvas.create_line(grid_position[0] - offset, grid_position[1] - offset,
                                 grid_position[0] + offset, grid_position[1] + offset,
@@ -183,11 +199,11 @@ class Tic_Tac_Toe():
     ###############
     def display_gameover(self):
 
-        if self.X_wins:
+        if self.X_wins and not self.O_wins:
             self.X_score += 1
             text = 'Winner: (X)'
             color = symbol_X_color
-        elif self.O_wins:
+        elif self.O_wins and not self.X_wins:
             self.O_score += 1
             text = 'Winner: (O)'
             color = symbol_O_color
@@ -196,18 +212,20 @@ class Tic_Tac_Toe():
             text = 'Its a tie'
             color = 'gray'
 
-        self.canvas.delete("all")
+        
+        # self.canvas.delete("all")
         self.canvas.create_text(size_of_board / 2, size_of_board / 3, font="cmr 60 bold", fill=color, text=text)
 
         score_text = 'Scores \n'
-        self.canvas.create_text(size_of_board / 2, 5 * size_of_board / 8, font="cmr 40 bold", fill=Green_color,
+        self.canvas.create_text(size_of_board / 2, 5 * size_of_board / 8, font="cmr 40 bold", fill=black,
                                 text=score_text)
 
         score_text = 'Player 1 (X) : ' + str(self.X_score) + '\n'
         score_text += 'Player 2 (O): ' + str(self.O_score) + '\n'
-        score_text += 'Tie                    : ' + str(self.tie_score)
-        self.canvas.create_text(size_of_board / 2, 3 * size_of_board / 4, font="cmr 30 bold", fill=Green_color,
+        score_text += 'Tie               : ' + str(self.tie_score)
+        self.canvas.create_text(size_of_board / 2, 3 * size_of_board / 4, font="cmr 30 bold", fill=black,
                                 text=score_text)
+
         self.reset_board = True
 
         score_text = 'Click to play again \n'
@@ -263,32 +281,31 @@ class Tic_Tac_Toe():
         return tie
 
     def is_gameover(self):
-        # Either someone wins or all grid occupied
+    # Check winners
         self.X_wins = self.is_winner('X')
+        self.O_wins = self.is_winner('O')
 
-        print(self.board_status)
-
-
-        if not self.X_wins:
-            self.O_wins = self.is_winner('O')
-
-        if not self.O_wins:
-            self.tie = self.is_tie()
-
-        gameover = self.X_wins or self.O_wins or self.tie
-
-        if self.X_wins:
+        if self.X_wins and self.O_wins:
+            print("Anomaly detected: both players marked as winners.")
+            print("Game is declared a tie.")
+            self.tie = True 
+        elif self.X_wins:
             print('X wins')
-        if self.O_wins:
+            return True 
+        elif self.O_wins:
             print('O wins')
-        if self.tie:
-            print('Its a tie')
+            return True 
 
-        
-        return gameover
+        if not self.X_wins and not self.O_wins:
+            self.tie = self.is_tie()
+            if self.tie:
+                print('Its a tie')
+
+        return self.X_wins or self.O_wins or self.tie
 
     
     def click(self, event):
+    
         grid_position = [event.x, event.y]
         logical_position = self.convert_grid_to_logical_position(grid_position)
         
@@ -310,7 +327,8 @@ class Tic_Tac_Toe():
                         self.board_status[logical_position[0]][logical_position[1]] = -1
                         self.player_X_turns = not self.player_X_turns
                         ###################
-                        self.myQuatum()
+                        if self.turn != 0:
+                            self.myQuatum()
                         ###############
                     self.turn +=1 ###############33
             else:
@@ -329,6 +347,7 @@ class Tic_Tac_Toe():
                     self.turn += 1 ###########3
 
 
+            self.update_status_text()  ####################
 
             # Check if game is concluded
             if self.is_gameover():
@@ -340,6 +359,8 @@ class Tic_Tac_Toe():
             self.reset_board = False
 
 
-game_instance = Tic_Tac_Toe()
-game_instance.mainloop()
+# game_instance = Tiq_Taq_Toq()
+# game_instance.mainloop()
 
+startup_screen = StartupScreen()
+startup_screen.run()
