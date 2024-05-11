@@ -21,4 +21,4 @@ Before you can run Tiq-Taq-Toq, ensure you have the following installed:
 You can install the required packages using pip:
 
 ```bash
-pip install numpy qiskit tkinter
+pip install numpy qiskit qiskit_aer
