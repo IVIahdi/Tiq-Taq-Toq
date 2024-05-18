@@ -26,10 +26,10 @@ class StartupScreen:
         self.canvas = Canvas(self.root, width=400, height=300)
         self.canvas.pack()
 
-        entangle_btn = Button(self.root, text='Entanglement Mode (Fare)', command=lambda: self.start_game(0))
+        entangle_btn = Button(self.root, text='Entanglement Mode (Fair)', command=lambda: self.start_game(0), width=25, height=4, bg='lightgreen', fg='black')
         entangle_btn_canvas = self.canvas.create_window(200, 100, window=entangle_btn)
 
-        superpos_btn = Button(self.root, text='Superposition Mode (Unfare)', command=lambda: self.start_game(1))
+        superpos_btn = Button(self.root, text='Superposition Mode (Unfair)', command=lambda: self.start_game(1), width=25, height=4, bg='#FFCCCC', fg='black')
         superpos_btn_canvas = self.canvas.create_window(200, 200, window=superpos_btn)
 
     def start_game(self, mode):
