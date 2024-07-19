@@ -22,3 +22,9 @@ You can install the required packages using pip:
 
 ```bash
 pip install numpy qiskit qiskit_aer
+
+
+![image](https://github.com/user-attachments/assets/7991fedc-0b06-4182-b9ad-f598870a89ea)
+![image](https://github.com/user-attachments/assets/989cf869-5afd-4df4-9556-c7dd49094e45)
+![image](https://github.com/user-attachments/assets/0fc534c6-1c3b-4b65-9e41-c4b2e0510f54)
+![image](https://github.com/user-attachments/assets/dec77613-245e-4700-8d43-3a44caa88b49)
